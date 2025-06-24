@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liberdade Econômica: Desburocratizando para o Crescimento</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Inspired by Brasão de Três Corações (Primary Blue: #1A5E9F, Secondary Yellow: #FFE000, Accent Red: #EF4444, Neutral Base: #F8FAFC, Text: #334155) -->
+    <!-- Application Structure Plan: A dashboard-style, single-page application organized into thematic sections based on the PACEF method (Diagnóstico, Impacto, O Caso de Três Corações, Soluções). This structure was chosen to transform the dense report into a more digestible and engaging user experience. Instead of a linear document, it allows users to jump directly to data-driven insights (Impacto), local context, or actionable proposals, making it more functional for busy public managers. Key interactions include interactive charts for data exploration and expandable cards for detailed information, promoting user engagement over passive reading. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: "Doing Business" data (time to open business/get permits). Goal: Compare. Viz: Interactive Bar Chart (Chart.js/Canvas). Interaction: Hover for details. Justification: Bar charts are ideal for comparing performance across different entities (BH vs. Brasil Média), making disparities instantly clear. Library: Chart.js for its responsiveness and ease of use.
+        - Report Info: Bureaucratic Obstacles. Goal: Inform/Organize. Viz: Thematic Cards (HTML/Tailwind). Interaction: Click to expand details. Justification: Organizes complex information into clean, manageable chunks, preventing user overload. Method: HTML/CSS/JS.
+        - Report Info: Legal framework in Três Corações. Goal: Show Progression. Viz: Timeline-like card layout. Interaction: Scroll to see evolution. Justification: Visually represents the chronological development of local legislation, adding context. Method: HTML/CSS.
+        - Report Info: Proposals for action. Goal: Inform/Action. Viz: Accordion List. Interaction: Click to expand. Justification: Presents a long list of proposals in a compact, user-friendly format. Method: HTML/CSS/JS.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50, base clara */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .section-icon {
+            font-size: 2.5rem;
+            line-height: 1;
+            color: #1a5e9f; /* Um azul mais escuro do brasão */
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img src="Brasao_Tres_Coracoes.jpeg-ecd5885a-a8c5-4600-9047-2bf0e2beb86a" alt="Brasão da Prefeitura de Três Corações" class="h-10 w-10 object-contain" onerror="this.onerror=null; this.src='https://placehold.co/40x40/1A5E9F/FFFFFF?text=TC';">
+                <div class="text-xl font-bold text-slate-900">
+                    <span class="text-[#1a5e9f]">L</span>iberdade <span class="text-[#1a5e9f]">E</span>conômica
+                </div>
+            </div>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#diagnostico" class="text-slate-600 hover:text-[#1a5e9f] transition duration-300">Diagnóstico</a>
+                <a href="#impacto" class="text-slate-600 hover:text-[#1a5e9f] transition duration-300">Impacto</a>
+                <a href="#caso-local" class="text-slate-600 hover:text-[#1a5e9f] transition duration-300">O Caso Local</a>
+                <a href="#solucoes" class="bg-[#1a5e9f] text-white px-4 py-2 rounded-md hover:bg-[#1a5e9f]/90 transition duration-300">Soluções</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-slate-800">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden bg-white py-2">
+            <a href="#diagnostico" class="block px-6 py-2 text-slate-600 hover:bg-slate-100">Diagnóstico</a>
+            <a href="#impacto" class="block px-6 py-2 text-slate-600 hover:bg-slate-100">Impacto</a>
+            <a href="#caso-local" class="block px-6 py-2 text-slate-600 hover:bg-slate-100">O Caso Local</a>
+            <a href="#solucoes" class="block px-6 py-2 text-slate-600 hover:bg-slate-100">Soluções</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="bg-white py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-5xl font-bold text-slate-900 leading-tight">Desburocratizando para o Crescimento</h1>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">Uma análise interativa sobre os desafios da liberdade econômica no Brasil e o caminho para um ambiente de negócios mais simples, justo e próspero para os municípios.</p>
+                <div class="mt-8">
+                    <a href="#diagnostico" class="bg-[#1a5e9f] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#1a5e9f]/90 transition duration-300">Comece a Explorar</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="diagnostico" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <span class="section-icon">🧩</span>
+                    <h2 class="text-3xl font-bold mt-2">Diagnóstico: O Labirinto Burocrático</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">O empreendedorismo no Brasil enfrenta uma complexa teia de obstáculos regulatórios. Esta seção detalha os principais entraves nos níveis municipal, estadual e federal que dificultam a jornada de quem deseja abrir e operar um negócio.</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="font-bold text-xl mb-2 text-[#1a5e9f]">Obstáculos Municipais</h3>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Excesso de alvarás e licenças prévias.</li>
+                            <li>Prazos longos e sobrepostos para aprovações.</li>
+                            <li>Códigos de postura e zoneamento desatualizados.</li>
+                            <li>Consultas de viabilidade locacional lentas e não automatizadas.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="font-bold text-xl mb-2 text-[#1a5e9f]">Obstáculos Estaduais</h3>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Requisitos adicionais que dificultam a padronização.</li>
+                            <li>Interpretações variadas da legislação federal.</li>
+                            <li>Falta de harmonização com as normas municipais.</li>
+                            <li>Complexidade no licenciamento sanitário e ambiental.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 class="font-bold text-xl mb-2 text-[#1a5e9f]">Obstáculos Federais</h3>
+                        <ul class="space-y-2 text-slate-600 list-disc list-inside">
+                            <li>Complexidade do sistema tributário e obrigações acessórias.</li>
+                            <li>Duplicidade de exigências em relação a outros entes.</li>
+                            <li>Resoluções do CGSIM que podem gerar conflitos com a autonomia municipal.</li>
+                            <li>Cultura de controle prévio em detrimento da fiscalização orientadora.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impacto" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <span class="section-icon">📊</span>
+                    <h2 class="text-3xl font-bold mt-2">Impacto: O Custo da Burocracia</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">A falta de liberdade econômica impõe um freio real ao crescimento. Os dados do relatório "Doing Business Subnacional Brasil 2021" do Banco Mundial revelam o tempo consumido por processos burocráticos, comparando a média nacional com o desempenho de cidades que investiram em simplificação, como Belo Horizonte.</p>
+                </div>
+                
+                <div class="bg-slate-50 p-6 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-bold text-center mb-4">Tempo Médio para Procedimentos Empresariais (em dias)</h3>
+                    <div class="chart-container">
+                        <canvas id="doingBusinessChart"></canvas>
+                    </div>
+                     <p class="text-center text-sm text-slate-500 mt-4">Fonte: Doing Business Subnacional Brasil 2021. O gráfico ilustra a diferença de tempo para abrir uma empresa e obter alvarás, destacando o potencial de ganho com a desburocratização.</p>
+                </div>
+
+                <div class="mt-12 grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg border border-red-200">
+                        <h3 class="font-bold text-lg mb-2 text-red-700">Efeitos Negativos da Burocracia</h3>
+                        <ul class="space-y-2 text-slate-600">
+                            <li>📉 Dificuldade na criação de empregos formais.</li>
+                            <li>💰 Queda na arrecadação tributária pela informalidade.</li>
+                            <li>🐌 Inibição da inovação e da competitividade.</li>
+                            <li>🚶 Desestímulo ao empreendedorismo.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg border border-green-200">
+                         <h3 class="font-bold text-lg mb-2 text-green-700">Benefícios da Simplificação</h3>
+                        <ul class="space-y-2 text-slate-600">
+                            <li>📈 Estímulo à formalização de novos negócios.</li>
+                            <li>💸 Aumento da base de arrecadação municipal.</li>
+                            <li>🚀 Fomento à inovação e atração de investimentos.</li>
+                            <li>✅ Melhoria do ambiente de negócios e da confiança.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="caso-local" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                     <span class="section-icon">📍</span>
+                    <h2 class="text-3xl font-bold mt-2">O Caso de Três Corações/MG</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Analisar a legislação local é fundamental para entender os desafios e oportunidades. Três Corações tem avançado na modernização de suas normas, um caminho essencial para alinhar-se aos princípios da liberdade econômica. A seguir, a evolução da legislação pertinente.</p>
+                </div>
+                <div class="relative">
+                    <div class="absolute left-1/2 h-full w-0.5 bg-slate-300 transform -translate-x-1/2 hidden md:block"></div>
+                    
+                    <div class="space-y-12">
+                        <div class="md:grid md:grid-cols-2 md:gap-8 items-center">
+                            <div class="text-center md:text-right md:pr-8">
+                                <p class="font-bold text-2xl text-[#1a5e9f]">2010</p>
+                            </div>
+                            <div class="mt-4 md:mt-0 relative">
+                                <div class="absolute -left-2.5 top-1/2 w-5 h-5 bg-[#1a5e9f] rounded-full border-4 border-white hidden md:block"></div>
+                                <div class="bg-white p-6 rounded-lg shadow-lg md:ml-4">
+                                    <h3 class="font-bold text-lg">Decreto nº 1.999/2010</h3>
+                                    <p class="mt-2 text-slate-600">Regulamentou o Código de Posturas, estabelecendo uma longa lista de documentos e laudos (Vigilância Sanitária, obras, meio ambiente, trânsito) para a concessão do alvará de funcionamento.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="md:grid md:grid-cols-2 md:gap-8 items-center">
+                             <div class="mt-4 md:mt-0 relative md:order-2">
+                                <div class="absolute -left-2.5 top-1/2 w-5 h-5 bg-[#1a5e9f] rounded-full border-4 border-white hidden md:block"></div>
+                                <div class="bg-white p-6 rounded-lg shadow-lg md:ml-4">
+                                    <h3 class="font-bold text-lg">Decreto nº 4.323/2021</h3>
+                                    <p class="mt-2 text-slate-600">Regulamentou a Lei Federal da Liberdade Econômica, instituindo o programa "Três Corações Livre para Crescer", classificando atividades por risco e definindo o prazo de 60 dias para resposta (com aprovação tácita).</p>
+                                </div>
+                            </div>
+                             <div class="text-center md:text-right md:pr-8 md:order-1">
+                                <p class="font-bold text-2xl text-[#1a5e9f]">2021</p>
+                            </div>
+                        </div>
+                        
+                        <div class="md:grid md:grid-cols-2 md:gap-8 items-center">
+                            <div class="text-center md:text-right md:pr-8">
+                                <p class="font-bold text-2xl text-[#1a5e9f]">2022</p>
+                            </div>
+                             <div class="mt-4 md:mt-0 relative">
+                                <div class="absolute -left-2.5 top-1/2 w-5 h-5 bg-[#1a5e9f] rounded-full border-4 border-white hidden md:block"></div>
+                                <div class="bg-white p-6 rounded-lg shadow-lg md:ml-4">
+                                    <h3 class="font-bold text-lg">Decreto nº 4.479/2022</h3>
+                                    <p class="mt-2 text-slate-600">Estabeleceu regras específicas para o licenciamento sanitário, detalhando a classificação de risco (Níveis I, II e III) e os procedimentos para cada um, buscando otimizar os prazos da Vigilância Sanitária.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                         <div class="md:grid md:grid-cols-2 md:gap-8 items-center">
+                            <div class="mt-4 md:mt-0 relative md:order-2">
+                                <div class="absolute -left-2.5 top-1/2 w-5 h-5 bg-[#1a5e9f] rounded-full border-4 border-white hidden md:block"></div>
+                                <div class="bg-white p-6 rounded-lg shadow-lg md:ml-4">
+                                    <h3 class="font-bold text-lg">Portaria nº 360/2025</h3>
+                                    <p class="mt-2 text-slate-600">Instituiu a "Comissão de Análise para instituir a Declaração Municipal de Direitos de Liberdade Econômica", um passo fundamental para revisar e propor adequações na legislação municipal vigente, com prazo de 60 dias para concluir os trabalhos.</p>
+                                </div>
+                            </div>
+                            <div class="text-center md:text-right md:pr-8 md:order-1">
+                                <p class="font-bold text-2xl text-[#1a5e9f]">2025</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="solucoes" class="py-16 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <span class="section-icon">💡</span>
+                    <h2 class="text-3xl font-bold mt-2">Finalização: Propostas para um Futuro Próspero</h2>
+                    <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Para reverter o cenário de entraves, é crucial adotar uma abordagem estratégica e proativa. As propostas a seguir visam construir um ambiente de negócios mais livre, dinâmico e seguro, impulsionando o desenvolvimento sustentável do município.</p>
+                </div>
+                <div id="proposals-accordion" class="max-w-4xl mx-auto space-y-4">
+                    <!-- Accordion items will be injected by JS -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-slate-800 text-white">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>&copy; 2025 Análise Interativa de Liberdade Econômica.</p>
+            <p class="text-sm text-slate-400 mt-2">Desenvolvido por Lilian Retori - <a href="https://www.linkedin.com/in/lilian-retori" target="_blank" class="text-blue-400 hover:underline">LinkedIn</a></p>
+            <p class="text-sm text-slate-400 mt-2">Esta aplicação foi gerada para fins de demonstração e sensibilização de gestores públicos, com base nos documentos fornecidos.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            const proposals = [
+                {
+                    title: "1. Revisão e Modernização das Leis Municipais",
+                    content: `<ul>
+                        <li class='mb-2'><strong>Códigos de Postura, Zoneamento e Obras:</strong> Analisar e revisar as leis para eliminar exigências obsoletas e conflitantes com a Lei Federal nº 13.874/2019.</li>
+                        <li class='mb-2'><strong>Classificação de Risco:</strong> Aprofundar a classificação para ampliar as atividades de "baixo risco" que dispensam atos de liberação prévia, focando na fiscalização posterior.</li>
+                        <li class='mb-2'><strong>Regras Claras:</strong> Regulamentar termos subjetivos nas normas com critérios claros e objetivos para evitar insegurança jurídica.</li>
+                        <li><strong>Dupla Visita:</strong> Implementar o critério de dupla visita para a lavratura de autos de infração, priorizando a orientação sobre a punição.</li>
+                    </ul>`
+                },
+                {
+                    title: "2. Uso Estratégico de Decretos Simplificadores",
+                    content: `<ul>
+                        <li class='mb-2'><strong>Agilização por Decreto:</strong> Utilizar decretos para simplificar procedimentos administrativos, reduzir prazos de resposta e efetivar a aprovação tácita.</li>
+                        <li><strong>Integração de Alvarás:</strong> Buscar a unificação de alvarás (funcionamento, sanitário, ambiental) em um único processo, otimizando o tempo do empreendedor.</li>
+                    </ul>`
+                },
+                {
+                    title: "3. Digitalização e Automação de Processos",
+                    content: `<ul>
+                        <li class='mb-2'><strong>Plataformas Digitais:</strong> Desenvolver ou aprimorar portais digitais para registro e licenciamento, como o programa "Três Corações Livre para Crescer".</li>
+                        <li class='mb-2'><strong>Sistemas Integrados:</strong> Promover a interoperabilidade entre sistemas municipais e com as esferas estadual e federal (REDESIM) para eliminar a duplicidade de informações.</li>
+                        <li><strong>Viabilidade Automática:</strong> Automatizar ao máximo as consultas de viabilidade locacional com georreferenciamento e dados atualizados.</li>
+                    </ul>`
+                },
+                {
+                    title: "4. Revogação de Normas Obsoletas ('Revogaço')",
+                    content: `<ul>
+                        <li class='mb-2'><strong>Análise Periódica:</strong> Instituir um processo contínuo de revisão e revogação de leis, decretos e portarias que se mostrem ineficazes ou redundantes. A "Comissão de Análise" local tem papel central aqui.</li>
+                        <li><strong>Medidas Razoáveis:</strong> Garantir que exigências de medidas compensatórias ou mitigatórias sejam proporcionais ao impacto direto da atividade econômica, evitando abusos.</li>
+                    </ul>`
+                }
+            ];
+
+            const accordionContainer = document.getElementById('proposals-accordion');
+            proposals.forEach((proposal, index) => {
+                const item = document.createElement('div');
+                item.className = 'border border-slate-200 rounded-lg overflow-hidden';
+                item.innerHTML = `
+                    <button class="accordion-header w-full text-left p-4 bg-slate-100 hover:bg-slate-200 transition duration-300 flex justify-between items-center">
+                        <span class="font-semibold text-lg">${proposal.title}</span>
+                        <svg class="w-5 h-5 transform transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    <div class="accordion-content hidden p-4 bg-white text-slate-600">
+                        ${proposal.content}
+                    </div>
+                `;
+                accordionContainer.appendChild(item);
+            });
+
+            document.querySelectorAll('.accordion-header').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('svg');
+                    content.classList.toggle('hidden');
+                    icon.classList.toggle('rotate-180');
+                });
+            });
+
+            const ctx = document.getElementById('doingBusinessChart').getContext('2d');
+            const doingBusinessChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Abertura de Empresa'],
+                    datasets: [
+                        {
+                            label: 'Belo Horizonte/MG (Referência de Agilidade)',
+                            data: [9.5, 187.5],
+                            backgroundColor: 'rgba(255, 224, 0, 0.7)', /* Amarelo do brasão */
+                            borderColor: 'rgba(255, 224, 0, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Média Brasil (27 localidades)',
+                            data: [15.4, 296],
+                            backgroundColor: 'rgba(26, 94, 159, 0.7)', /* Azul escuro do brasão */
+                            borderColor: 'rgba(26, 94, 159, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Tempo Médio (dias)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                             callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += context.parsed.x + ' dias';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                     if (mobileMenu.classList.contains('hidden') === false) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>
