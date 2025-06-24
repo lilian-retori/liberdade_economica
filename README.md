@@ -68,20 +68,10 @@ O Caso de Três Corações/MG
 
 🚀 Como Visualizar
 
-Para explorar a aplicação, siga estes passos simples:
 
-1. Clone o repositório:
+Acesse a aplicação diretamente através do link:
 
-git clone https://github.com/<seu-usuario>/<nome-do-repositorio>.git
-
-2. Navegue até o diretório do projeto:
-
-cd <nome-do-repositorio>
-
-3. Abra o arquivo:
-Simplesmente abra o arquivo liberdade_economica_spa.html em seu navegador web preferido.
-
-(Alternativamente, para um servidor local simples, você pode usar python -m http.server no diretório do projeto e acessar http://localhost:8000)
+https://liberdade-economica.netlify.app/
 
 
 🤝 Contribuições
